@@ -1,6 +1,7 @@
 import { Inter } from 'next/font/google';
 
 import "./globals.css";
+import AppNavbar from '@/components/Navbar';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -21,7 +22,7 @@ export default function RootLayout({ children }) {
       className="light"
     >
       <body className={`${inter.className} antialiased text-slate-800 bg-slate-50`}>
-
+          <AppNavbar></AppNavbar>
           <main className="min-h-screen">
             {children}
           </main>
