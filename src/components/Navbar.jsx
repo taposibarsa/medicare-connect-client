@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import Image from "next/image";
 
 const menuItems = [
   { name: 'Home', path: '/' },
@@ -43,9 +44,18 @@ export default function AppNavbar() {
           </button>
 
           <Link href="/">
-            <p className="text-2xl font-bold tracking-tight text-[#5e17eb]">
-              MediCare<span className="text-slate-800">+</span>
-            </p>
+            <div className='flex items-center gap-1 '>
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                width={40}
+                height={40}
+                priority
+              />
+              <p className="text-slate-800 text-2xl font-bold">
+                MediCare<span className="text-2xl font-bold tracking-tight text-[#5e17eb]">Connect</span>
+              </p>
+            </div>
           </Link>
         </div>
 
@@ -57,11 +67,10 @@ export default function AppNavbar() {
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`font-medium transition-colors ${
-                    isActive
-                      ? 'text-[#5e17eb]'
-                      : 'text-slate-600 hover:text-[#5e17eb]'
-                  }`}
+                  className={`font-medium transition-colors ${isActive
+                    ? 'text-[#5e17eb]'
+                    : 'text-slate-600 hover:text-[#5e17eb]'
+                    }`}
                 >
                   {item.name}
                 </Link>
@@ -98,9 +107,8 @@ export default function AppNavbar() {
                   <Link
                     href={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`block w-full py-2 text-lg font-medium ${
-                      isActive ? 'text-[#5e17eb]' : 'text-slate-700'
-                    }`}
+                    className={`block w-full py-2 text-lg font-medium ${isActive ? 'text-[#5e17eb]' : 'text-slate-700'
+                      }`}
                   >
                     {item.name}
                   </Link>
