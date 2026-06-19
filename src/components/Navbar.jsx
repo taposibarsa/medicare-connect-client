@@ -14,6 +14,7 @@ import { Button } from '@heroui/react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import Image from "next/image";
+import ThemeSwitcher from "./ThemeSwitcher";
 
 const menuItems = [
   { name: "Home", path: "/", icon: Home },
@@ -29,7 +30,7 @@ export default function AppNavbar() {
 
   // Login এবং Register বাটনের টগল লজিক (Active State Styling)
   const isLoginPage = pathname === '/login';
-  
+
   const loginBtnClasses = isLoginPage
     ? "bg-[#5e17eb] text-white shadow-md shadow-[#5e17eb]/30 hover:bg-[#4a12bc]" // Active (Solid)
     : "bg-[#5e17eb]/10 text-[#5e17eb] hover:bg-[#5e17eb]/20"; // Inactive (Flat)
@@ -39,24 +40,29 @@ export default function AppNavbar() {
     : "bg-[#5e17eb]/10 text-[#5e17eb] hover:bg-[#5e17eb]/20"; // Inactive (Flat)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80  backdrop-blur-md dark:bg-[#111827] dark:text-white">
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-        
-        {/* Mobile: Hamburger Button (Left aligned) */}
-        <button
-          type="button"
-          aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-          className="lg:hidden inline-flex items-center justify-center rounded-md p-2 text-[#5e17eb] hover:bg-[#5e17eb]/10 transition-colors"
-          onClick={() => setIsMenuOpen((open) => !open)}
-        >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            {isMenuOpen ? (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+
+        {/* Mobile: Hamburger Button & Theme Switcher (Left aligned) */}
+        <div className="flex items-center gap-3 lg:hidden">
+          <button
+            type="button"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            className="inline-flex items-center justify-center rounded-md p-2 text-[#5e17eb] hover:bg-[#5e17eb]/10 transition-colors"
+            onClick={() => setIsMenuOpen((open) => !open)}
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              {isMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
+          {/* Theme Switcher লোগোর ঠিক আগে বসানো হলো */}
+          <ThemeSwitcher />
+        </div>
 
         {/* Logo (Right on mobile, Left on desktop) */}
         <div className="flex flex-1 justify-end lg:flex-none lg:justify-start">
@@ -69,7 +75,7 @@ export default function AppNavbar() {
                 height={40}
                 priority
               />
-              <p className="text-slate-800 text-2xl font-bold">
+              <p className="text-slate-800 dark:text-white text-2xl font-bold">
                 MediCare<span className="text-2xl font-bold tracking-tight text-[#5e17eb]">Connect</span>
               </p>
             </div>
@@ -86,11 +92,10 @@ export default function AppNavbar() {
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${
-                    isActive 
-                      ? 'text-[#5e17eb] bg-violet-50 font-medium' 
-                      : 'text-slate-600 hover:bg-violet-50 hover:text-[#5e17eb]'
-                  }`}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${isActive
+                    ? 'text-[#5e17eb] bg-violet-50 dark:bg-[#5e17eb]/10 font-medium'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-slate-800 hover:text-[#5e17eb] dark:hover:text-[#5e17eb]'
+                    }`}
                 >
                   <Icon size={18} />
                   <span>{item.name}</span>
@@ -102,6 +107,7 @@ export default function AppNavbar() {
 
         {/* Desktop Buttons - Right */}
         <div className="hidden lg:flex items-center gap-3">
+          <ThemeSwitcher />
           <Button
             className={`px-6 font-medium transition-all duration-200 ${loginBtnClasses}`}
             onPress={() => router.push('/login')}
@@ -120,6 +126,10 @@ export default function AppNavbar() {
       {/* Mobile Menu Dropdown */}
       {isMenuOpen && (
         <div className="border-t border-slate-200 px-4 py-4 lg:hidden bg-white shadow-lg">
+          <div className="mb-4 flex justify-between items-center">
+            <span className="font-medium text-slate-600 dark:text-slate-300">Theme</span>
+            <ThemeSwitcher /> {/* মোবাইলের জন্য এখানে বসান */}
+          </div>
           <ul className="space-y-2 mb-6">
             {menuItems.map((item) => {
               const isActive = pathname === item.path;
@@ -130,11 +140,10 @@ export default function AppNavbar() {
                   <Link
                     href={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`block w-full py-3 px-4 rounded-lg text-lg font-medium flex items-center gap-3 transition-colors ${
-                      isActive 
-                        ? 'text-[#5e17eb] bg-violet-50' 
-                        : 'text-slate-700 hover:bg-slate-50'
-                    }`}
+                    className={`block w-full py-3 px-4 rounded-lg text-lg font-medium flex items-center gap-3 transition-colors ${isActive
+                      ? 'text-[#5e17eb] bg-violet-50'
+                      : 'text-slate-700 hover:bg-slate-50'
+                      }`}
                   >
                     <Icon size={20} />
                     <span>{item.name}</span>
@@ -143,22 +152,22 @@ export default function AppNavbar() {
               );
             })}
           </ul>
-          
+
           {/* Mobile Buttons */}
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              className={`w-full py-6 text-base font-medium transition-all duration-200 ${loginBtnClasses}`} 
-              onPress={() => { setIsMenuOpen(false); router.push('/login'); }} 
-            > 
+            <Button
+              className={`w-full py-6 text-base font-medium transition-all duration-200 ${loginBtnClasses}`}
+              onPress={() => { setIsMenuOpen(false); router.push('/login'); }}
+            >
               <LogIn size={18} className="mr-2" />
-              Login 
+              Login
             </Button>
-            <Button 
-              className={`w-full py-6 text-base font-medium transition-all duration-200 ${registerBtnClasses}`} 
-              onPress={() => { setIsMenuOpen(false); router.push('/register'); }} 
-            > 
+            <Button
+              className={`w-full py-6 text-base font-medium transition-all duration-200 ${registerBtnClasses}`}
+              onPress={() => { setIsMenuOpen(false); router.push('/register'); }}
+            >
               <UserPlus size={18} className="mr-2" />
-              Register 
+              Register
             </Button>
           </div>
         </div>

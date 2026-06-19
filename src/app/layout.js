@@ -2,6 +2,7 @@ import { Inter } from 'next/font/google';
 
 import "./globals.css";
 import AppNavbar from '@/components/Navbar';
+import { Providers } from './providers';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -17,17 +18,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html
-      lang="en"
-      className="light"
-    >
-      <body className={`${inter.className} antialiased text-slate-800 bg-slate-50`}>
-          <AppNavbar></AppNavbar>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.className} antialiased text-slate-800 bg-slate-50 dark:bg-[#0f172a]/80 dark:text-slate-200`}>
+        <Providers>
+          <AppNavbar />
           <main className="min-h-screen">
             {children}
           </main>
-
-
+        </Providers>
       </body>
     </html>
   );
