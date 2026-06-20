@@ -15,6 +15,9 @@ const inter = Inter({
 export const metadata = {
   title: 'MediCare Connect | Healthcare Management',
   description: 'Doctor Appointment & Healthcare Management System',
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
