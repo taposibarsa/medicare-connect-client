@@ -40,7 +40,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-[#0f172a] transition-colors duration-300">
+    <footer className="border-t border-slate-200 bg-violet-50 dark:border-slate-800 dark:bg-[#0f172a] transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           

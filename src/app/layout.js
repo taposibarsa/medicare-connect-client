@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.className} antialiased text-slate-800 bg-slate-50 dark:bg-[#0f172a]/80 dark:text-slate-200`}>
         <Providers>
           <AppNavbar />
-          <main className="min-h-screen">
+          <main>
             {children}
           </main>
           <Footer></Footer>
