@@ -1,8 +1,34 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
+let cachedToken = null;
+let tokenExpiry = 0;
+
 export async function getToken() {
-  // Phase 4: wire to Better Auth JWT token endpoint
-  return null;
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  if (cachedToken && Date.now() < tokenExpiry) {
+    return cachedToken;
+  }
+
+  const res = await fetch('/api/express-token', { credentials: 'include' });
+
+  if (!res.ok) {
+    cachedToken = null;
+    tokenExpiry = 0;
+    return null;
+  }
+
+  const data = await res.json();
+  cachedToken = data.token;
+  tokenExpiry = Date.now() + 23 * 60 * 60 * 1000;
+  return cachedToken;
+}
+
+export function clearTokenCache() {
+  cachedToken = null;
+  tokenExpiry = 0;
 }
 
 export async function apiFetch(path, { method = 'GET', body, token, cache = 'no-store' } = {}) {
@@ -52,6 +78,31 @@ export async function getDoctorById(id) {
 
 export async function getStats() {
   return apiFetch('/api/stats');
+}
+
+export async function apiFetchAuthenticated(path, options = {}) {
+  const token = await getToken();
+
+  if (!token) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/login';
+    }
+    return null;
+  }
+
+  return apiFetch(path, { ...options, token });
+}
+
+export async function getMe() {
+  return apiFetchAuthenticated('/api/users/me');
+}
+
+export async function updateMe(body) {
+  return apiFetchAuthenticated('/api/users/me', { method: 'PUT', body });
+}
+
+export async function createDoctorProfile(body) {
+  return apiFetchAuthenticated('/api/doctors', { method: 'POST', body });
 }
 
 export async function getReviews({ doctorId, limit } = {}) {

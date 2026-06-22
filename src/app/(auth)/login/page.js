@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@heroui/react";
 import {
   Eye,
@@ -17,8 +17,11 @@ import {
 } from "lucide-react";
 import { authClient } from "@/app/lib/auth-client";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,6 +32,12 @@ export default function LoginPage() {
   useEffect(() => {
     document.title = "Login | MediCare Connect";
   }, []);
+
+  useEffect(() => {
+    if (searchParams.get("error") === "suspended") {
+      setError("Your account has been suspended. Please contact support.");
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -44,7 +53,7 @@ export default function LoginPage() {
       const { error: signInError } = await authClient.signIn.email({
         email: email.trim(),
         password,
-        callbackURL: "/dashboard",
+        callbackURL: callbackUrl,
       });
 
       if (signInError) {
@@ -52,7 +61,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      router.push(callbackUrl);
       router.refresh();
     } catch {
       setError("Something went wrong. Please try again.");
@@ -67,7 +76,7 @@ export default function LoginPage() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard",
+        callbackURL: callbackUrl,
       });
     } catch {
       setError("Google sign-in failed. Please try again.");
@@ -77,7 +86,6 @@ export default function LoginPage() {
 
   return (
     <div className="grid w-full max-w-5xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60 dark:border-slate-800 dark:bg-[#111827] dark:shadow-none lg:grid-cols-2">
-      {/* Brand panel */}
       <div className="relative hidden flex-col justify-between bg-gradient-to-br from-[#5e17eb] via-[#6d28d9] to-[#4c1d95] p-10 text-white lg:flex">
         <div>
           <Link href="/" className="inline-flex items-center gap-2">
@@ -111,7 +119,6 @@ export default function LoginPage() {
         </ul>
       </div>
 
-      {/* Form panel */}
       <div className="flex flex-col justify-center p-8 sm:p-10">
         <div className="mb-8 lg:hidden">
           <Link href="/" className="inline-flex items-center gap-2">
@@ -246,5 +253,13 @@ export default function LoginPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="text-center text-slate-500">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
