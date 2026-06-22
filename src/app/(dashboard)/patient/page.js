@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import PatientOverview from '@/components/dashboard/patient/PatientOverview';
 
-export default function PatientOverviewPage() {
-  return <DashboardPlaceholder title="Patient Overview" />;
+export default function PatientPage() {
+  return <PatientOverview />;
 }

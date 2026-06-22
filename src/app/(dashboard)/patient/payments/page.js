@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import PatientPayments from '@/components/dashboard/patient/PatientPayments';
 
 export default function PatientPaymentsPage() {
-  return <DashboardPlaceholder title="Payment History" />;
+  return <PatientPayments />;
 }

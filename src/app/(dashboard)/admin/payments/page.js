@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import AdminPayments from '@/components/dashboard/admin/AdminPayments';
 
 export default function AdminPaymentsPage() {
-  return <DashboardPlaceholder title="Payments" />;
+  return <AdminPayments />;
 }

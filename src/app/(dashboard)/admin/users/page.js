@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import AdminUsers from '@/components/dashboard/admin/AdminUsers';
 
 export default function AdminUsersPage() {
-  return <DashboardPlaceholder title="User Management" />;
+  return <AdminUsers />;
 }

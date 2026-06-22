@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import AdminDoctors from '@/components/dashboard/admin/AdminDoctors';
 
 export default function AdminDoctorsPage() {
-  return <DashboardPlaceholder title="Doctor Verification" />;
+  return <AdminDoctors />;
 }

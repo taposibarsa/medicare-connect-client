@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import AdminOverview from '@/components/dashboard/admin/AdminOverview';
 
-export default function AdminOverviewPage() {
-  return <DashboardPlaceholder title="Admin Overview" />;
+export default function AdminPage() {
+  return <AdminOverview />;
 }

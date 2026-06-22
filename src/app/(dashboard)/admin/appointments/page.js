@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import AdminAppointments from '@/components/dashboard/admin/AdminAppointments';
 
 export default function AdminAppointmentsPage() {
-  return <DashboardPlaceholder title="All Appointments" />;
+  return <AdminAppointments />;
 }

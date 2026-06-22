@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import PatientReviewsPage from '@/components/dashboard/patient/PatientReviews';
 
-export default function PatientReviewsPage() {
-  return <DashboardPlaceholder title="My Reviews" />;
+export default function PatientReviewsRoute() {
+  return <PatientReviewsPage />;
 }

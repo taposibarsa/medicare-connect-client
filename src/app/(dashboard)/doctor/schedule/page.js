@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import DoctorSchedule from '@/components/dashboard/doctor/DoctorSchedule';
 
 export default function DoctorSchedulePage() {
-  return <DashboardPlaceholder title="Schedule" />;
+  return <DoctorSchedule />;
 }

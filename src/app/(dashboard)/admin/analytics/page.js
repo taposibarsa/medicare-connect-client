@@ -1,5 +1,5 @@
-import DashboardPlaceholder from '@/components/DashboardPlaceholder';
+import AdminAnalytics from '@/components/dashboard/admin/AdminAnalytics';
 
 export default function AdminAnalyticsPage() {
-  return <DashboardPlaceholder title="Analytics" />;
+  return <AdminAnalytics />;
 }
