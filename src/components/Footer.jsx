@@ -26,7 +26,6 @@ const quickLinks = [
   { name: "Find Doctors", path: "/find-doctors" },
   { name: "About Us", path: "/about" },
   { name: "Contact Us", path: "/contact" },
-  { name: "Dashboard", path: "/dashboard" },
 ];
 
 const socialLinks = [
@@ -145,14 +144,6 @@ export default function Footer() {
           <p className="text-slate-600 dark:text-slate-400 text-center md:text-left">
             &copy; {currentYear} MediCare Connect. All rights reserved.
           </p>
-          <div className="mt-4 flex gap-6 md:mt-0">
-            <Link href="/privacy" className="text-sm text-slate-600 hover:text-[#5e17eb] dark:text-slate-400 dark:hover:text-[#5e17eb]">
-              Privacy Policy
-            </Link>
-            <Link href="/terms" className="text-sm text-slate-600 hover:text-[#5e17eb] dark:text-slate-400 dark:hover:text-[#5e17eb]">
-              Terms of Service
-            </Link>
-          </div>
         </div>
       </div>
     </footer>
