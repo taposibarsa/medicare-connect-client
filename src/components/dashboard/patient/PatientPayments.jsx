@@ -26,7 +26,7 @@ export default function PatientPayments() {
       </div>
 
       {payments.length === 0 ? (
-        <EmptyState title="No payments yet" message="Payments appear after you book and pay for an appointment." />
+        <EmptyState title="No payments yet" message="Payments appear after you complete checkout when booking a doctor." />
       ) : (
         <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-[#111827]">
           <div className="hidden md:block overflow-x-auto">

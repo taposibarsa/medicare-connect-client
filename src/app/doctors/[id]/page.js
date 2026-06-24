@@ -181,6 +181,7 @@ export default async function DoctorDetailsPage({ params }) {
             <div className="sticky top-24">
               <BookingForm
                 doctorId={id}
+                consultationFee={doctor.consultationFee}
                 availableDays={doctor.availableDays}
                 availableSlots={doctor.availableSlots}
               />

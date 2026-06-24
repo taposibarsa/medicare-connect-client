@@ -204,3 +204,14 @@ export async function getAdminAnalytics() {
 export async function getPayments() {
   return apiFetchAuthenticated('/api/payments');
 }
+
+export async function createCheckoutSession(body) {
+  return apiFetchAuthenticated('/api/payments/checkout', { method: 'POST', body });
+}
+
+export async function confirmCheckoutSession(sessionId) {
+  return apiFetchAuthenticated('/api/payments/confirm-session', {
+    method: 'POST',
+    body: { sessionId },
+  });
+}

@@ -26,7 +26,7 @@ export default function AdminPayments() {
       </div>
 
       {payments.length === 0 ? (
-        <EmptyState title="No payments recorded" message="Payments will appear after patients complete Stripe checkout (Phase 6)." />
+        <EmptyState title="No payments recorded" message="Payments appear after patients complete Stripe checkout." />
       ) : (
         <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm dark:border-slate-800 dark:bg-[#111827]">
           <table className="w-full text-left text-sm">
