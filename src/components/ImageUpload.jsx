@@ -1,13 +1,31 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { Upload, X, Loader2 } from 'lucide-react';
+import { uploadImageFile } from '@/lib/api';
 
-export default function ImageUpload({ value, onChange, label = 'Profile photo' }) {
+export default function ImageUpload({
+  value,
+  onChange,
+  onFileChange,
+  label = 'Profile photo',
+  deferUpload = false,
+}) {
   const inputRef = useRef(null);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
+  const [localPreview, setLocalPreview] = useState('');
+
+  const preview = value || localPreview;
+
+  useEffect(() => {
+    return () => {
+      if (localPreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(localPreview);
+      }
+    };
+  }, [localPreview]);
 
   const handleFile = async (file) => {
     if (!file) return;
@@ -23,24 +41,25 @@ export default function ImageUpload({ value, onChange, label = 'Profile photo' }
     }
 
     setError('');
+
+    if (deferUpload) {
+      if (localPreview?.startsWith('blob:')) {
+        URL.revokeObjectURL(localPreview);
+      }
+
+      const objectUrl = URL.createObjectURL(file);
+      setLocalPreview(objectUrl);
+      onFileChange?.(file);
+      onChange?.('');
+      return;
+    }
+
     setIsUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-
-      const res = await fetch('/api/upload-image', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Upload failed');
-      }
-
+      const data = await uploadImageFile(file);
       onChange(data.url);
+      onFileChange?.(null);
     } catch (err) {
       setError(err.message || 'Upload failed. Please try again.');
     } finally {
@@ -49,7 +68,14 @@ export default function ImageUpload({ value, onChange, label = 'Profile photo' }
   };
 
   const handleRemove = () => {
-    onChange('');
+    if (localPreview?.startsWith('blob:')) {
+      URL.revokeObjectURL(localPreview);
+    }
+
+    setLocalPreview('');
+    onChange?.('');
+    onFileChange?.(null);
+
     if (inputRef.current) {
       inputRef.current.value = '';
     }
@@ -63,9 +89,9 @@ export default function ImageUpload({ value, onChange, label = 'Profile photo' }
       </label>
 
       <div className="flex items-center gap-4">
-        {value ? (
+        {preview ? (
           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border border-slate-200 dark:border-slate-700">
-            <Image src={value} alt="Profile preview" fill className="object-cover" unoptimized />
+            <Image src={preview} alt="Profile preview" fill className="object-cover" unoptimized />
             <button
               type="button"
               onClick={handleRemove}
@@ -81,7 +107,7 @@ export default function ImageUpload({ value, onChange, label = 'Profile photo' }
           </div>
         )}
 
-        <div className="flex-1">
+        <div className="min-w-0 flex-1">
           <input
             ref={inputRef}
             type="file"
@@ -101,10 +127,14 @@ export default function ImageUpload({ value, onChange, label = 'Profile photo' }
                 Uploading...
               </span>
             ) : (
-              value ? 'Change photo' : 'Upload photo'
+              preview ? 'Change photo' : 'Upload photo'
             )}
           </button>
-          <p className="mt-1 text-xs text-slate-400">JPG, PNG or WebP. Max 5 MB.</p>
+          <p className="mt-1 text-xs text-slate-400">
+            {deferUpload
+              ? 'Photo will be saved when you create your account.'
+              : 'JPG, PNG or WebP. Max 5 MB.'}
+          </p>
         </div>
       </div>
 

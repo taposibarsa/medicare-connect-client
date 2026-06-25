@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import { authClient } from "@/app/lib/auth-client";
 import ImageUpload from "@/components/ImageUpload";
-import { createDoctorProfile, getToken } from "@/lib/api";
+import { createDoctorProfile, getToken, updateMe, uploadImageFile } from "@/lib/api";
 
 const PASSWORD_RULES = [
   { label: "At least 6 characters", test: (p) => p.length >= 6 },
@@ -44,7 +44,7 @@ export default function RegisterPage() {
   const [role, setRole] = useState("patient");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [photoUrl, setPhotoUrl] = useState("");
+  const [photoFile, setPhotoFile] = useState(null);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -103,7 +103,6 @@ export default function RegisterPage() {
         name: name.trim(),
         email: email.trim(),
         password,
-        image: photoUrl.trim() || undefined,
         role,
         callbackURL: "/dashboard",
       });
@@ -111,6 +110,22 @@ export default function RegisterPage() {
       if (signUpError) {
         setError(signUpError.message || "Registration failed. Please try again.");
         return;
+      }
+
+      let uploadedPhotoUrl = "";
+
+      if (photoFile) {
+        try {
+          const uploadResult = await uploadImageFile(photoFile);
+          uploadedPhotoUrl = uploadResult.url || "";
+
+          if (uploadedPhotoUrl) {
+            await updateMe({ photo: uploadedPhotoUrl });
+            await authClient.updateUser({ image: uploadedPhotoUrl });
+          }
+        } catch (uploadErr) {
+          console.error('Photo upload after registration failed:', uploadErr);
+        }
       }
 
       if (role === "doctor") {
@@ -128,7 +143,7 @@ export default function RegisterPage() {
           experience: Number(experience),
           consultationFee: Number(consultationFee),
           hospitalName: hospitalName.trim(),
-          profileImage: photoUrl.trim(),
+          profileImage: uploadedPhotoUrl,
         });
 
         setSuccess(
@@ -305,7 +320,7 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <ImageUpload value={photoUrl} onChange={setPhotoUrl} />
+          <ImageUpload deferUpload onFileChange={setPhotoFile} />
 
           {role === "doctor" && (
             <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/50 p-4 dark:border-slate-700 dark:bg-slate-800/30">

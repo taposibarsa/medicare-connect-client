@@ -93,6 +93,25 @@ export async function updateMe(body) {
   return apiFetchAuthenticated('/api/users/me', { method: 'PUT', body });
 }
 
+export async function uploadImageFile(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const res = await fetch('/api/upload-image', {
+    method: 'POST',
+    body: formData,
+    credentials: 'include',
+  });
+
+  const data = await res.json().catch(() => ({}));
+
+  if (!res.ok) {
+    throw new Error(data.message || 'Upload failed');
+  }
+
+  return data;
+}
+
 export async function createDoctorProfile(body) {
   return apiFetchAuthenticated('/api/doctors', { method: 'POST', body });
 }

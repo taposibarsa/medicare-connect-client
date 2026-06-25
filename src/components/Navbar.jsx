@@ -41,15 +41,21 @@ export default function AppNavbar() {
     ? "bg-[#5e17eb] text-white shadow-md shadow-[#5e17eb]/30 hover:bg-[#4a12bc]"
     : "bg-[#5e17eb]/10 text-[#5e17eb] hover:bg-[#5e17eb]/20";
 
-  return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800 bg-white/80  backdrop-blur-md dark:bg-[#111827] dark:text-white">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+  const dashboardActive =
+    pathname.startsWith('/patient') ||
+    pathname.startsWith('/doctor') ||
+    pathname.startsWith('/admin') ||
+    pathname === '/dashboard';
 
-        <div className="flex items-center gap-3 lg:hidden">
+  return (
+    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/80 backdrop-blur-md dark:border-slate-800 dark:bg-[#111827] dark:text-white">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
+        <div className="flex items-center gap-2 lg:hidden">
           <button
             type="button"
             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            className="inline-flex items-center justify-center rounded-md p-2 text-[#5e17eb] hover:bg-[#5e17eb]/10 transition-colors"
+            aria-expanded={isMenuOpen}
+            className="inline-flex items-center justify-center rounded-md p-2 text-[#5e17eb] transition-colors hover:bg-[#5e17eb]/10"
             onClick={() => setIsMenuOpen((open) => !open)}
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -60,28 +66,23 @@ export default function AppNavbar() {
               )}
             </svg>
           </button>
-
-          <ThemeSwitcher />
         </div>
 
-        <div className="flex flex-1 justify-end lg:flex-none lg:justify-start">
-          <Link href="/">
-            <div className='flex items-center gap-1'>
-              <Image
-                src="/logo.png"
-                alt="Logo"
-                width={40}
-                height={40}
-                priority
-              />
-              <p className="text-slate-800 dark:text-white text-2xl font-bold">
-                MediCare<span className="text-2xl font-bold tracking-tight text-[#5e17eb]">Connect</span>
-              </p>
-            </div>
-          </Link>
-        </div>
+        <Link href="/" className="flex min-w-0 shrink items-center gap-2 lg:mr-4">
+          <Image
+            src="/logo.png"
+            alt="MediCare Connect logo"
+            width={36}
+            height={36}
+            className="shrink-0"
+            priority
+          />
+          <p className="truncate text-base font-bold text-slate-800 dark:text-white sm:text-lg lg:text-2xl">
+            MediCare<span className="text-[#5e17eb]">Connect</span>
+          </p>
+        </Link>
 
-        <ul className="hidden lg:flex flex-1 justify-center items-center gap-6">
+        <ul className="hidden flex-1 items-center justify-center gap-1 lg:flex xl:gap-2">
           {menuItems.map((item) => {
             const isActive = pathname === item.path;
             const Icon = item.icon;
@@ -90,10 +91,11 @@ export default function AppNavbar() {
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${isActive
-                    ? 'text-[#5e17eb] bg-violet-50 dark:bg-[#5e17eb]/10 font-medium'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-slate-800 hover:text-[#5e17eb] dark:hover:text-[#5e17eb]'
-                    }`}
+                  className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all ${
+                    isActive
+                      ? 'bg-violet-50 font-medium text-[#5e17eb] dark:bg-[#5e17eb]/10'
+                      : 'text-slate-600 hover:bg-violet-50 hover:text-[#5e17eb] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#5e17eb]'
+                  }`}
                 >
                   <Icon size={18} />
                   <span>{item.name}</span>
@@ -105,13 +107,10 @@ export default function AppNavbar() {
             <li>
               <Link
                 href="/dashboard"
-                className={`flex items-center gap-2 rounded-lg px-3 py-2 transition-all ${
-                  pathname.startsWith('/patient') ||
-                  pathname.startsWith('/doctor') ||
-                  pathname.startsWith('/admin') ||
-                  pathname === '/dashboard'
-                    ? 'text-[#5e17eb] bg-violet-50 dark:bg-[#5e17eb]/10 font-medium'
-                    : 'text-slate-600 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-slate-800 hover:text-[#5e17eb]'
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all ${
+                  dashboardActive
+                    ? 'bg-violet-50 font-medium text-[#5e17eb] dark:bg-[#5e17eb]/10'
+                    : 'text-slate-600 hover:bg-violet-50 hover:text-[#5e17eb] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-[#5e17eb]'
                 }`}
               >
                 <LayoutDashboard size={18} />
@@ -121,23 +120,38 @@ export default function AppNavbar() {
           )}
         </ul>
 
-        <div className="hidden lg:flex items-center gap-3">
-          <ThemeSwitcher />
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          <div className="hidden lg:block">
+            <ThemeSwitcher />
+          </div>
+
           {!isPending && isLoggedIn ? (
             <UserProfileDropdown user={session.user} />
           ) : !isPending ? (
             <>
               <Button
-                className={`px-6 font-medium transition-all duration-200 ${loginBtnClasses}`}
+                size="sm"
+                className={`hidden font-medium transition-all duration-200 sm:inline-flex ${loginBtnClasses}`}
                 onPress={() => router.push('/login')}
               >
                 Login
               </Button>
               <Button
-                className={`px-6 font-medium transition-all duration-200 ${registerBtnClasses}`}
+                size="sm"
+                className={`hidden font-medium transition-all duration-200 sm:inline-flex ${registerBtnClasses}`}
                 onPress={() => router.push('/register')}
               >
                 Register
+              </Button>
+              <Button
+                isIconOnly
+                size="sm"
+                variant="flat"
+                className="text-[#5e17eb] sm:hidden"
+                aria-label="Login"
+                onPress={() => router.push('/login')}
+              >
+                <LogIn size={18} />
               </Button>
             </>
           ) : null}
@@ -145,12 +159,13 @@ export default function AppNavbar() {
       </nav>
 
       {isMenuOpen && (
-        <div className="border-t border-slate-200 px-4 py-4 lg:hidden bg-white shadow-lg dark:bg-[#111827]">
-          <div className="mb-4 flex justify-between items-center">
-            <span className="font-medium text-slate-600 dark:text-slate-300">Theme</span>
+        <div className="border-t border-slate-200 bg-white px-4 py-4 shadow-lg dark:border-slate-800 dark:bg-[#111827] lg:hidden">
+          <div className="mb-4 flex items-center justify-between">
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">Theme</span>
             <ThemeSwitcher />
           </div>
-          <ul className="space-y-2 mb-6">
+
+          <ul className="mb-6 space-y-1">
             {menuItems.map((item) => {
               const isActive = pathname === item.path;
               const Icon = item.icon;
@@ -160,10 +175,11 @@ export default function AppNavbar() {
                   <Link
                     href={item.path}
                     onClick={() => setIsMenuOpen(false)}
-                    className={`block w-full py-3 px-4 rounded-lg text-lg font-medium flex items-center gap-3 transition-colors ${isActive
-                      ? 'text-[#5e17eb] bg-violet-50'
-                      : 'text-slate-700 hover:bg-slate-50'
-                      }`}
+                    className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors ${
+                      isActive
+                        ? 'bg-violet-50 text-[#5e17eb] dark:bg-[#5e17eb]/10'
+                        : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800'
+                    }`}
                   >
                     <Icon size={20} />
                     <span>{item.name}</span>
@@ -176,7 +192,11 @@ export default function AppNavbar() {
                 <Link
                   href="/dashboard"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block w-full py-3 px-4 rounded-lg text-lg font-medium flex items-center gap-3 text-slate-700 hover:bg-slate-50"
+                  className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-colors ${
+                    dashboardActive
+                      ? 'bg-violet-50 text-[#5e17eb] dark:bg-[#5e17eb]/10'
+                      : 'text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800'
+                  }`}
                 >
                   <LayoutDashboard size={20} />
                   Dashboard
@@ -185,28 +205,30 @@ export default function AppNavbar() {
             )}
           </ul>
 
-          {!isPending && isLoggedIn ? (
-            <div className="flex justify-center">
-              <UserProfileDropdown user={session.user} />
-            </div>
-          ) : !isPending ? (
-            <div className="flex flex-col sm:flex-row gap-3">
+          {!isPending && !isLoggedIn && (
+            <div className="flex flex-col gap-3">
               <Button
-                className={`w-full py-6 text-base font-medium transition-all duration-200 ${loginBtnClasses}`}
-                onPress={() => { setIsMenuOpen(false); router.push('/login'); }}
+                className={`w-full py-5 text-base font-medium transition-all duration-200 ${loginBtnClasses}`}
+                onPress={() => {
+                  setIsMenuOpen(false);
+                  router.push('/login');
+                }}
               >
                 <LogIn size={18} className="mr-2" />
                 Login
               </Button>
               <Button
-                className={`w-full py-6 text-base font-medium transition-all duration-200 ${registerBtnClasses}`}
-                onPress={() => { setIsMenuOpen(false); router.push('/register'); }}
+                className={`w-full py-5 text-base font-medium transition-all duration-200 ${registerBtnClasses}`}
+                onPress={() => {
+                  setIsMenuOpen(false);
+                  router.push('/register');
+                }}
               >
                 <UserPlus size={18} className="mr-2" />
                 Register
               </Button>
             </div>
-          ) : null}
+          )}
         </div>
       )}
     </header>
