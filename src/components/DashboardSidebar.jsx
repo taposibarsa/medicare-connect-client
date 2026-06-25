@@ -25,8 +25,10 @@ const NAV_BY_ROLE = {
   patient: [
     { label: 'Overview', href: '/patient', icon: LayoutDashboard },
     { label: 'Appointments', href: '/patient/appointments', icon: Calendar },
+    { label: 'Prescriptions', href: '/patient/prescriptions', icon: FileText },
     { label: 'Payments', href: '/patient/payments', icon: CreditCard },
     { label: 'Reviews', href: '/patient/reviews', icon: Star },
+    { label: 'Profile', href: '/patient/profile', icon: UserCircle },
   ],
   doctor: [
     { label: 'Overview', href: '/doctor', icon: LayoutDashboard },
