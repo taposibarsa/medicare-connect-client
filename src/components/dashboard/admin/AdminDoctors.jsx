@@ -26,10 +26,16 @@ export default function AdminDoctors() {
     if (!confirm) return;
     setIsSaving(true);
     try {
-      if (confirm.action === 'verify') await verifyDoctor(confirm.id);
-      else if (confirm.action === 'reject') await rejectDoctor(confirm.id);
-      else await revokeDoctor(confirm.id);
-      toast.success('Doctor updated');
+      if (confirm.action === 'verify') {
+        await verifyDoctor(confirm.id);
+        toast.success('Doctor verified successfully');
+      } else if (confirm.action === 'reject') {
+        await rejectDoctor(confirm.id);
+        toast.success('Doctor application rejected');
+      } else {
+        await revokeDoctor(confirm.id);
+        toast.success('Doctor verification revoked');
+      }
       setConfirm(null);
       refetch();
     } catch (err) {

@@ -3,15 +3,18 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@heroui/react';
 import { toast } from 'sonner';
+import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 import PageHeader from '@/components/dashboard/PageHeader';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
+import usePageTitle from '@/hooks/usePageTitle';
+import { DAY_NAMES } from '@/lib/dayNames';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { getMyDoctorProfile, updateDoctor } from '@/lib/api';
 
-const DAY_OPTIONS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_OPTIONS = DAY_NAMES;
 
 export default function DoctorSchedule() {
-  useEffect(() => { document.title = 'Schedule | Doctor Dashboard | MediCare Connect'; }, []);
+  usePageTitle('Schedule | Doctor Dashboard | MediCare Connect');
 
   const { data, isLoading, refetch } = useAsyncData(() => getMyDoctorProfile(), []);
   const doctor = data?.data;
@@ -87,6 +90,14 @@ export default function DoctorSchedule() {
           </div>
         </section>
       </div>
+
+      <section className="mt-6 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-[#111827]">
+        <h2 className="mb-4 font-semibold text-slate-800 dark:text-white">Monthly availability preview</h2>
+        <p className="mb-4 text-sm text-slate-500 dark:text-slate-400">
+          Highlighted dates show when patients can book based on your selected weekdays.
+        </p>
+        <AvailabilityCalendar availableDays={days} mode="display" />
+      </section>
     </div>
   );
 }

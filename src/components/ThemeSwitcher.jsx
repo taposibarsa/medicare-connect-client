@@ -17,7 +17,7 @@ export default function ThemeSwitcher() {
   if (!mounted) return null;
 
   return (
-    <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-[#111827]]">
+    <div className="flex items-center gap-1 rounded-full bg-slate-100 p-1 dark:bg-[#111827]">
       <Button
         isIconOnly
         size="sm"

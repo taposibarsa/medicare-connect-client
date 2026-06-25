@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle2, Calendar, Loader2, AlertCircle, Stethoscope, Clock, DollarSign } from 'lucide-react';
 import { Button, Spinner } from '@heroui/react';
 import StatusBadge from '@/components/dashboard/StatusBadge';
+import usePageTitle from '@/hooks/usePageTitle';
+import { toast } from 'sonner';
 import { confirmCheckoutSession } from '@/lib/api';
 import { formatDateTime } from '@/lib/dashboardUtils';
 
@@ -69,9 +71,7 @@ function PaymentSuccessContent() {
   const [error, setError] = useState('');
   const [booking, setBooking] = useState(null);
 
-  useEffect(() => {
-    document.title = 'Payment Successful | MediCare Connect';
-  }, []);
+  usePageTitle('Payment Successful | MediCare Connect');
 
   useEffect(() => {
     if (!sessionId) return;
@@ -84,11 +84,14 @@ function PaymentSuccessContent() {
         if (!cancelled) {
           setBooking(result?.data || null);
           setStatus('confirmed');
+          toast.success('Payment successful! Your appointment has been booked.');
         }
       } catch (err) {
         if (!cancelled) {
+          const msg = err.message || 'Could not confirm your booking';
           setStatus('error');
-          setError(err.message || 'Could not confirm your booking');
+          setError(msg);
+          toast.error(msg);
         }
       }
     })();

@@ -7,6 +7,8 @@ import { Save, User } from 'lucide-react';
 import { authClient } from '@/app/lib/auth-client';
 import AuthLoading, { useAuthGuard } from '@/components/RoleGuard';
 import ImageUpload from '@/components/ImageUpload';
+import usePageTitle from '@/hooks/usePageTitle';
+import { toast } from 'sonner';
 import { getMe, updateMe } from '@/lib/api';
 
 const GENDERS = [
@@ -27,11 +29,8 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  useEffect(() => {
-    document.title = 'My Profile | MediCare Connect';
-  }, []);
+  usePageTitle('My Profile | MediCare Connect');
 
   useEffect(() => {
     if (isPending || !session?.user) return;
@@ -53,7 +52,9 @@ export default function ProfilePage() {
           setRole(user.role || '');
         }
       } catch (err) {
-        setError(err.message || 'Failed to load profile.');
+        const msg = err.message || 'Failed to load profile.';
+        setError(msg);
+        toast.error(msg);
       } finally {
         setIsLoading(false);
       }
@@ -65,7 +66,6 @@ export default function ProfilePage() {
   const handleSave = async (e) => {
     e.preventDefault();
     setError('');
-    setSuccess('');
     setIsSaving(true);
 
     try {
@@ -81,9 +81,11 @@ export default function ProfilePage() {
         image: photo || undefined,
       });
 
-      setSuccess('Profile updated successfully.');
+      toast.success('Profile updated successfully.');
     } catch (err) {
-      setError(err.message || 'Failed to save profile.');
+      const msg = err.message || 'Failed to save profile.';
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsSaving(false);
     }
@@ -115,12 +117,6 @@ export default function ProfilePage() {
         {error && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-400">
             {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900/40 dark:bg-green-900/20 dark:text-green-400">
-            {success}
           </div>
         )}
 

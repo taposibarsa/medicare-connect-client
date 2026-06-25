@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
+export const metadata = {
+  title: 'Page Not Found | MediCare Connect',
+  description: 'The page you are looking for could not be found.',
+};
+
 export default function NotFound() {
   return (
     <main className="flex min-h-[70vh] items-center justify-center bg-slate-50 px-6 dark:bg-[#0f172a]">

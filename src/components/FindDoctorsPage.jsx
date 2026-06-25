@@ -2,12 +2,18 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Search, ChevronLeft, ChevronRight, LayoutGrid, List } from 'lucide-react';
 import { Button } from '@heroui/react';
 import { getDoctors } from '@/lib/api';
 import DoctorCard from '@/components/DoctorCard';
 import EmptyState from '@/components/EmptyState';
 import SectionHeading from '@/components/SectionHeading';
+import StarRating from '@/components/StarRating';
+import DoctorGridSkeleton from '@/components/skeletons/DoctorGridSkeleton';
+
+const VIEW_STORAGE_KEY = 'medicare-find-doctors-view';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Default' },
@@ -18,6 +24,77 @@ const SORT_OPTIONS = [
   { value: 'rating_desc', label: 'Highest Rating' },
 ];
 
+const DEFAULT_AVATAR =
+  'https://ui-avatars.com/api/?background=5e17eb&color=fff&bold=true&name=Dr';
+
+function DoctorsTable({ doctors }) {
+  return (
+    <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900/60">
+      <table className="min-w-full text-left text-sm">
+        <thead className="border-b border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-300">
+          <tr>
+            <th className="px-4 py-3 font-semibold">Doctor</th>
+            <th className="px-4 py-3 font-semibold">Specialization</th>
+            <th className="px-4 py-3 font-semibold">Experience</th>
+            <th className="px-4 py-3 font-semibold">Fee</th>
+            <th className="px-4 py-3 font-semibold">Rating</th>
+            <th className="px-4 py-3 font-semibold">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {doctors.map((doctor) => {
+            const id = doctor._id || doctor.id;
+            const imageSrc =
+              doctor.profileImage ||
+              `${DEFAULT_AVATAR}+${encodeURIComponent(doctor.doctorName || 'Doctor')}`;
+
+            return (
+              <tr
+                key={id}
+                className="border-b border-slate-100 last:border-0 dark:border-slate-800"
+              >
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={imageSrc}
+                      alt={doctor.doctorName}
+                      width={40}
+                      height={40}
+                      className="rounded-full object-cover"
+                      unoptimized={imageSrc.includes('ui-avatars.com')}
+                    />
+                    <span className="font-medium text-slate-800 dark:text-white">
+                      {doctor.doctorName}
+                    </span>
+                  </div>
+                </td>
+                <td className="px-4 py-3 text-[#5e17eb]">{doctor.specialization}</td>
+                <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                  {doctor.experience} yrs
+                </td>
+                <td className="px-4 py-3 text-slate-600 dark:text-slate-300">
+                  ${doctor.consultationFee}
+                </td>
+                <td className="px-4 py-3">
+                  <StarRating rating={doctor.avgRating} size={14} />
+                </td>
+                <td className="px-4 py-3">
+                  <Link
+                    href={`/doctors/${id}`}
+                    className="font-medium text-[#5e17eb] hover:underline"
+                  >
+                    View Profile
+                  </Link>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function FindDoctorsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -25,11 +102,19 @@ export default function FindDoctorsPage() {
   const [search, setSearch] = useState(searchParams.get('search') || searchParams.get('specialization') || '');
   const [sort, setSort] = useState(searchParams.get('sort') || '');
   const [page, setPage] = useState(Number(searchParams.get('page')) || 1);
+  const [viewMode, setViewMode] = useState('card');
   const [doctors, setDoctors] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const saved = localStorage.getItem(VIEW_STORAGE_KEY);
+    if (saved === 'card' || saved === 'table') {
+      setViewMode(saved);
+    }
+  }, []);
 
   const updateUrl = useCallback(
     (nextSearch, nextSort, nextPage) => {
@@ -73,8 +158,13 @@ export default function FindDoctorsPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleViewChange = (mode) => {
+    setViewMode(mode);
+    localStorage.setItem(VIEW_STORAGE_KEY, mode);
+  };
+
   return (
-    <div className="bg-slate-50 py-12 dark:bg-[#0f172a] min-h-screen">
+    <div className="min-h-screen bg-slate-50 py-12 dark:bg-[#0f172a]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <SectionHeading
           title="Find Doctors"
@@ -97,20 +187,51 @@ export default function FindDoctorsPage() {
             />
           </div>
 
-          <select
-            value={sort}
-            onChange={(e) => {
-              setSort(e.target.value);
-              setPage(1);
-            }}
-            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 outline-none focus:border-[#5e17eb] dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-          >
-            {SORT_OPTIONS.map((opt) => (
-              <option key={opt.value || 'default'} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900">
+              <button
+                type="button"
+                onClick={() => handleViewChange('card')}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  viewMode === 'card'
+                    ? 'bg-[#5e17eb] text-white'
+                    : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
+                }`}
+                aria-label="Card view"
+              >
+                <LayoutGrid size={16} />
+                Cards
+              </button>
+              <button
+                type="button"
+                onClick={() => handleViewChange('table')}
+                className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  viewMode === 'table'
+                    ? 'bg-[#5e17eb] text-white'
+                    : 'text-slate-600 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
+                }`}
+                aria-label="Table view"
+              >
+                <List size={16} />
+                Table
+              </button>
+            </div>
+
+            <select
+              value={sort}
+              onChange={(e) => {
+                setSort(e.target.value);
+                setPage(1);
+              }}
+              className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-800 outline-none focus:border-[#5e17eb] dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value || 'default'} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {!loading && !error && (
@@ -119,13 +240,7 @@ export default function FindDoctorsPage() {
           </p>
         )}
 
-        {loading && (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="h-96 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />
-            ))}
-          </div>
-        )}
+        {loading && <DoctorGridSkeleton />}
 
         {!loading && error && <EmptyState title="Unable to load doctors" message={error} />}
 
@@ -138,11 +253,15 @@ export default function FindDoctorsPage() {
 
         {!loading && !error && doctors.length > 0 && (
           <>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {doctors.map((doctor) => (
-                <DoctorCard key={doctor._id} doctor={doctor} />
-              ))}
-            </div>
+            {viewMode === 'card' ? (
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {doctors.map((doctor) => (
+                  <DoctorCard key={doctor._id} doctor={doctor} />
+                ))}
+              </div>
+            ) : (
+              <DoctorsTable doctors={doctors} />
+            )}
 
             {totalPages > 1 && (
               <div className="mt-10 flex items-center justify-center gap-2">

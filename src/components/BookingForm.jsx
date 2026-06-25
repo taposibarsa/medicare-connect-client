@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { Button } from '@heroui/react';
 import { Calendar, Clock, DollarSign, FileText } from 'lucide-react';
 import { toast } from 'sonner';
+import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 import { useSession } from '@/app/lib/auth-client';
+import { getDayNameFromDate } from '@/lib/dayNames';
 import { createCheckoutSession } from '@/lib/api';
-
-const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function BookingForm({
   doctorId,
@@ -27,6 +27,7 @@ export default function BookingForm({
   const isLoggedIn = Boolean(session?.user);
   const isPatient = session?.user?.role === 'patient';
   const canBook = isLoggedIn && isPatient;
+  const todayKey = new Date().toISOString().split('T')[0];
 
   const validateDay = (dateStr) => {
     if (!dateStr || availableDays.length === 0) {
@@ -34,7 +35,7 @@ export default function BookingForm({
       return true;
     }
 
-    const dayName = DAY_NAMES[new Date(dateStr).getUTCDay()];
+    const dayName = getDayNameFromDate(dateStr);
     if (!availableDays.includes(dayName)) {
       setDayError(`Doctor is not available on ${dayName}. Available: ${availableDays.join(', ')}`);
       return false;
@@ -42,6 +43,11 @@ export default function BookingForm({
 
     setDayError('');
     return true;
+  };
+
+  const handleDateSelect = (dateStr) => {
+    setAppointmentDate(dateStr);
+    validateDay(dateStr);
   };
 
   const handleBookClick = () => {
@@ -69,6 +75,7 @@ export default function BookingForm({
     }
 
     if (!validateDay(appointmentDate)) {
+      toast.error(dayError || 'Selected date is not available.');
       return;
     }
 
@@ -123,20 +130,16 @@ export default function BookingForm({
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <div>
-          <label className="mb-1.5 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <label className="mb-2 flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
             <Calendar size={16} />
             Appointment Date
           </label>
-          <input
-            type="date"
-            value={appointmentDate}
-            onChange={(e) => {
-              setAppointmentDate(e.target.value);
-              validateDay(e.target.value);
-            }}
-            min={new Date().toISOString().split('T')[0]}
-            disabled={!canBook}
-            className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-800 outline-none focus:border-[#5e17eb] disabled:opacity-60 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+          <AvailabilityCalendar
+            availableDays={availableDays}
+            selectedDate={appointmentDate}
+            onSelectDate={canBook ? handleDateSelect : undefined}
+            mode="pick"
+            minDate={todayKey}
           />
           {dayError && <p className="mt-1 text-xs text-red-500">{dayError}</p>}
         </div>

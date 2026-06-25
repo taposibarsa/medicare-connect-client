@@ -3,6 +3,8 @@
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { XCircle } from 'lucide-react';
+import usePageTitle from '@/hooks/usePageTitle';
+import { toast } from 'sonner';
 import { Button } from '@heroui/react';
 
 function PaymentCancelContent() {
@@ -10,8 +12,10 @@ function PaymentCancelContent() {
   const searchParams = useSearchParams();
   const doctorId = searchParams.get('doctorId');
 
+  usePageTitle('Payment Cancelled | MediCare Connect');
+
   useEffect(() => {
-    document.title = 'Payment Cancelled | MediCare Connect';
+    toast.info('Payment cancelled — no charge was made.');
   }, []);
 
   return (

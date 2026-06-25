@@ -16,6 +16,8 @@ import {
   HeartPulse,
 } from "lucide-react";
 import { authClient } from "@/app/lib/auth-client";
+import usePageTitle from "@/hooks/usePageTitle";
+import { toast } from "sonner";
 
 function LoginForm() {
   const router = useRouter();
@@ -29,13 +31,13 @@ function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    document.title = "Login | MediCare Connect";
-  }, []);
+  usePageTitle("Login | MediCare Connect");
 
   useEffect(() => {
     if (searchParams.get("error") === "suspended") {
-      setError("Your account has been suspended. Please contact support.");
+      const msg = "Your account has been suspended. Please contact support.";
+      setError(msg);
+      toast.error(msg);
     }
   }, [searchParams]);
 
@@ -44,7 +46,9 @@ function LoginForm() {
     setError("");
 
     if (!email.trim() || !password) {
-      setError("Please enter your email and password.");
+      const msg = "Please enter your email and password.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
@@ -57,14 +61,19 @@ function LoginForm() {
       });
 
       if (signInError) {
-        setError(signInError.message || "Invalid email or password.");
+        const msg = signInError.message || "Invalid email or password.";
+        setError(msg);
+        toast.error(msg);
         return;
       }
 
+      toast.success("Welcome back!");
       router.push(callbackUrl);
       router.refresh();
     } catch {
-      setError("Something went wrong. Please try again.");
+      const msg = "Something went wrong. Please try again.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +88,9 @@ function LoginForm() {
         callbackURL: callbackUrl,
       });
     } catch {
-      setError("Google sign-in failed. Please try again.");
+      const msg = "Google sign-in failed. Please try again.";
+      setError(msg);
+      toast.error(msg);
       setIsGoogleLoading(false);
     }
   };

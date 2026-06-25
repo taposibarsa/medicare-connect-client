@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { authClient } from "@/app/lib/auth-client";
 import ImageUpload from "@/components/ImageUpload";
+import usePageTitle from "@/hooks/usePageTitle";
+import { toast } from "sonner";
 import { createDoctorProfile, getToken, updateMe, uploadImageFile } from "@/lib/api";
 
 const PASSWORD_RULES = [
@@ -50,7 +52,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const [specialization, setSpecialization] = useState("");
   const [qualifications, setQualifications] = useState("");
@@ -58,14 +59,11 @@ export default function RegisterPage() {
   const [consultationFee, setConsultationFee] = useState("");
   const [hospitalName, setHospitalName] = useState("");
 
-  useEffect(() => {
-    document.title = "Register | MediCare Connect";
-  }, []);
+  usePageTitle("Register | MediCare Connect");
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
 
     if (!name.trim()) {
       setError("Please enter your full name.");
@@ -146,11 +144,11 @@ export default function RegisterPage() {
           profileImage: uploadedPhotoUrl,
         });
 
-        setSuccess(
-          "Account created! Your doctor profile is pending admin verification. Redirecting..."
+        toast.success(
+          "Account created! Your doctor profile is pending admin verification."
         );
       } else {
-        setSuccess("Account created successfully! Redirecting...");
+        toast.success("Account created successfully!");
       }
 
       setTimeout(() => {
@@ -166,7 +164,6 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = async () => {
     setError("");
-    setSuccess("");
     setIsGoogleLoading(true);
     try {
       await authClient.signIn.social({
@@ -242,12 +239,6 @@ export default function RegisterPage() {
         {error && (
           <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-400">
             {error}
-          </div>
-        )}
-
-        {success && (
-          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700 dark:border-green-900/40 dark:bg-green-900/20 dark:text-green-400">
-            {success}
           </div>
         )}
 

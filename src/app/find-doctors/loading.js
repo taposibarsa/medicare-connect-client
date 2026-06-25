@@ -1,3 +1,5 @@
+import DoctorGridSkeleton from '@/components/skeletons/DoctorGridSkeleton';
+
 export default function Loading() {
   return (
     <div className="min-h-screen bg-slate-50 py-12 dark:bg-[#0f172a]">
@@ -8,11 +10,7 @@ export default function Loading() {
           <div className="h-12 flex-1 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />
           <div className="h-12 w-48 animate-pulse rounded-xl bg-slate-200 dark:bg-slate-800" />
         </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <div key={i} className="h-96 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />
-          ))}
-        </div>
+        <DoctorGridSkeleton />
       </div>
     </div>
   );
